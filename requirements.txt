@@ -5,6 +5,7 @@
 # You can also run `make switch-to-poetry` to use the poetry package manager.
 torch>=2.0.1
 pytest>=7.1.0
+numpy>=1.26.1
 coverage
 flake8
 black
