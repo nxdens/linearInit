@@ -107,7 +107,9 @@ class LinearWithInit(nn.Module):
             if isinstance(act_func, nn.Tanh):
                 nn.init.xavier_uniform_(linear_layer.weight.data)
             elif isinstance(act_func, nn.ReLU):
-                nn.init.kaiming_normal_(linear_layer.weight.data, nonlinearity="relu")
+                nn.init.kaiming_normal_(
+                    linear_layer.weight.data, nonlinearity="relu"
+                )
             elif isinstance(act_func, nn.LeakyReLU):
                 nn.init.kaiming_normal_(
                     linear_layer.weight.data, nonlinearity="leaky_relu"
