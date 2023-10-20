@@ -24,7 +24,14 @@ class FullyConnectedLayers(nn.Module):
     layers are initiated with different algorithms depending on the non-linear activation.
     """
 
-    def __init__(self, layer_sizes: List, activation=nn.GELU(), bias=False):
+    def __init__(
+        self,
+        layer_sizes: List,
+        activation=nn.GELU(),
+        bias=False,
+        dropout_p=0.1,
+        batchnorm=False,
+    ):
         """Creates a fully connected network with the given layer sizes. The layers are initiated with nn.GELU() by default.
 
         Args:
@@ -35,6 +42,9 @@ class FullyConnectedLayers(nn.Module):
         layers = []
         self.activation = activation
         self.bias = bias
+        self.dropout = dropout_p
+        self.batchnorm = batchnorm
+
         for i in range(len(layer_sizes) - 1):
             layers.append(
                 LinearWithInit(
@@ -42,6 +52,8 @@ class FullyConnectedLayers(nn.Module):
                     layer_sizes[i + 1],
                     activation=self.activation,
                     bias=self.bias,
+                    dropout_p=dropout_p,
+                    useBatchnorm=self.batchnorm,
                 )
             )
         self.net = nn.Sequential(*layers)
@@ -65,6 +77,8 @@ class LinearWithInit(nn.Module):
         out_features: int,
         bias: bool = False,
         activation: Any = nn.GELU(),
+        dropout_p: float = 0.1,
+        useBatchnorm: bool = False,
     ):
         """initializes a linear layer with a given activation function. The layer is initiated with different algorithms depending on the non-linear activation.
 
@@ -78,7 +92,15 @@ class LinearWithInit(nn.Module):
         self.act_func = activation
         self.linear = nn.Linear(in_features, out_features, bias=bias)
         self._weight_initialization(self.linear, self.act_func)
-        self.sequential = nn.Sequential(self.linear, self.act_func)
+        self.subModuleList = [self.linear, self.act_func]
+        self.dropout_p = dropout_p
+        self.useBatchnorm = useBatchnorm
+        if self.dropout_p > 0:
+            self.subModuleList.append(nn.Dropout(p=self.dropout_p))
+        if self.useBatchnorm:
+            self.subModuleList.append(nn.BatchNorm1d(out_features))
+
+        self.sequential = nn.Sequential(*self.subModuleList)
 
     def _weight_initialization(self, linear_layer, act_func):
         if isinstance(linear_layer, nn.Linear):

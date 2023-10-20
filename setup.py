@@ -32,15 +32,12 @@ def read_requirements(path):
 setup(
     name="linearinit",
     version=read("linearinit", "VERSION"),
-    description="Awesome linearinit created by nxdens",
+    description="nn.linear with initialization created by nxdens",
     url="https://github.com/nxdens/linearInit/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author="nxdens",
     packages=find_packages(exclude=["tests", ".github"]),
     install_requires=read_requirements("requirements.txt"),
-    entry_points={
-        "console_scripts": ["linearinit = linearinit.__main__:main"]
-    },
     extras_require={"test": read_requirements("requirements-test.txt")},
 )
