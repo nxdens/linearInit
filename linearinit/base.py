@@ -53,7 +53,7 @@ class FullyConnectedLayers(nn.Module):
                     activation=self.activation,
                     bias=self.bias,
                     dropout_p=dropout_p,
-                    batchnorm=self.batchnorm,
+                    useBatchnorm=self.batchnorm,
                 )
             )
         self.net = nn.Sequential(*layers)
@@ -100,7 +100,7 @@ class LinearWithInit(nn.Module):
         if self.useBatchnorm:
             self.subModuleList.append(nn.BatchNorm1d(out_features))
 
-        self.moduleList = nn.ModuleList(self.subModuleList)
+        self.sequential = nn.Sequential(*self.subModuleList)
 
     def _weight_initialization(self, linear_layer, act_func):
         if isinstance(linear_layer, nn.Linear):
@@ -118,4 +118,4 @@ class LinearWithInit(nn.Module):
                 linear_layer.bias.data.zero_()
 
     def forward(self, x):
-        return self.moduleList(x)
+        return self.sequential(x)
